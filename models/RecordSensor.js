@@ -2,8 +2,9 @@ import mongoose from "mongoose";
 
 const DeviceLogSchema = new mongoose.Schema(
     {
-        type: String,           
-        value: Number,
+      type: String,
+      name: String,
+      value: Number,
     },
     {
       timestamps: true,

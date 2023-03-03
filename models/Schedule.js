@@ -10,7 +10,7 @@ const ScheduleSchema = new mongoose.Schema(
             type: mongoose.Schema.Types.ObjectId,
             ref: "User",
         },
-        value: Boolean,
+        value: Number,
         timeSchedule: Date,
     },
     {

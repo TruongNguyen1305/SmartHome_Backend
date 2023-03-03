@@ -5,7 +5,6 @@ import route from './routes/index.js'
 import mongoose from 'mongoose'
 import { notFound, errorHandler } from './middlewares/errorMiddleware.js'
 
-
 dotenv.config()
 const app = express()
 
