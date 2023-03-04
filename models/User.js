@@ -5,17 +5,17 @@ import crypto from 'crypto'
 const UserSchema = new mongoose.Schema({
     email: { type: String, trim: true, unique: true, required: true },
     password: { type: String, trim: true, require: true, minLength: 6 },
-    name: { type: String, trim: true, required: true, minLength: 5 },
-    
-    phoneNumber: String,
-    
+    name: { type: String, required: true, minLength: 5 },
+
     pinCode: String,
+    home: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Home",
+    },
     facesRecog: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: "FaceID",
     }],
-    
-    key : { type: String }
 }, {
     timestamps: true
 })
