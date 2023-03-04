@@ -27,6 +27,7 @@ export const getAllUsers = async (req, res, next) => {
 //[POST] /api/users
 export const registerUser = async (req, res, next) => {
     const { name, email, password} = req.body
+    console.log(name, email, password)
     if (!name || !email || !password) {
         res.status(400)
         next(new Error('Bạn phải điền các thông tin cần thiết'))

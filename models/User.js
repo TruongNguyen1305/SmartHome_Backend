@@ -1,12 +1,21 @@
 import mongoose from "mongoose";
 import bcrypt from 'bcryptjs'
+import crypto from 'crypto'
 
 const UserSchema = new mongoose.Schema({
     email: { type: String, trim: true, unique: true, required: true },
-    password: { type: String, trim: true, require: true, minLength: 8 },
+    password: { type: String, trim: true, require: true, minLength: 6 },
     name: { type: String, trim: true, required: true, minLength: 5 },
-    // avatar: String,
+    
     phoneNumber: String,
+    
+    pinCode: String,
+    facesRecog: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "FaceID",
+    }],
+    
+    key : { type: String }
 }, {
     timestamps: true
 })
@@ -20,6 +29,12 @@ UserSchema.pre('save', async function(next){
 
     const salt  = await bcrypt.genSalt(10)
     this.password = await bcrypt.hash(this.password, salt)
+
+    if (!this.key) {
+        // generate a random key using Node.js crypto library
+        this.key = crypto.randomBytes(16).toString('hex');
+      }
+      
 })
 
 const User = mongoose.model('User', UserSchema)
