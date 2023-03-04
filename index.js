@@ -7,16 +7,13 @@ import { notFound, errorHandler } from './middlewares/errorMiddleware.js'
 import cors from 'cors'
 
 dotenv.config()
-
-
 const app = express()
 
 //Add middleware
-
+app.use(cors())
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true }))
 
-app.use(cors());
 route(app)
 //Add middleware to catch errors
 app.use(notFound)
