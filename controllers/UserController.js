@@ -80,15 +80,17 @@ export const authUser = async (req, res, next) => {
         res.status(400)
         next(new Error('Bạn phải điền các thông tin cần thiết'))
     }
-
     try {
         const user = await User.findOne({ email })
+        console.log(user)
         if (user && (await user.matchPassword(password))) {
             res.status(201).json({
                 _id: user._id,
                 name: user.name,
                 email: user.email,
-                token: generateToken(user._id)
+                pinCode: user.pinCode,
+                home: user.home,
+                token: generateToken(user._id),
             })
         }
         else {
@@ -99,4 +101,27 @@ export const authUser = async (req, res, next) => {
         console.log(error.message)
         next(error)
     }
+}
+
+//[PUT] /api/user/setpin
+export const setPin = async (req, res, next) => {
+    const { _id, pinCode } = req.body
+    console.log(_id, pinCode)
+    User.findOneAndUpdate({_id: _id}, {pinCode: pinCode}, {new: true})
+    .then(updatedUser => {
+        console.log(updatedUser); // Log ra user đã được update
+        res.status(201).json({
+            _id: updatedUser._id,
+            name: updatedUser.name,
+            email: updatedUser.email,
+            pinCode: updatedUser.pinCode,
+            home: updatedUser.home,
+            token: generateToken(updatedUser._id)
+        })
+        
+    })
+    .catch(error => {
+        res.status(401)
+        next(new Error('Error'))
+    });
 }
