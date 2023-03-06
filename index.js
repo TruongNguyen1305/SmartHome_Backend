@@ -12,9 +12,6 @@ import { createServer } from "http";
 
 // MQTT
 import mqtt from 'mqtt'
-const AIO_USERNAME = "nguyenphinam2k2"
-const AIO_KEY = "aio_rNnp068oGqZlonmhqELdr0JnvCmJ"
-const AIO_FEED_ID = "bbc-led"
 
 
 dotenv.config() 
@@ -32,51 +29,68 @@ app.use(errorHandler)
 const PORT = process.env.PORT || 5000
 
 /////////////////////////////////////////////////////////////////
+const AIO_USERNAME = process.env.AIO_USERNAME
+const AIO_KEY = process.env.AIO_KEY
+const AIO_FEED_ID = ['smarthome-dadn.smart-light','smarthome-dadn.smart-fan', 'smarthome-dadn.smart-door']
+
 const mqttClient = mqtt.connect({
     host: `io.adafruit.com`,
     port: 1883,
     username: AIO_USERNAME,
     password: AIO_KEY,
 });
-mqttClient.subscribe(`${AIO_USERNAME}/feeds/${AIO_FEED_ID}`);
+
+let initValue = []
+
+
+mqttClient.on('connect', () => {
+    AIO_FEED_ID.map((item) => {
+        mqttClient.subscribe(`${AIO_USERNAME}/feeds/${item}`);
+        console.log(`Connected ${item} to Adafruit IO`);
+        mqttClient.publish(`${AIO_USERNAME}/feeds/${item}/get`, '');
+    })
+    // Đăng ký chủ đề để nhận giá trị từ feed
+    // Gửi yêu cầu để nhận giá trị hiện tại của feed
+});
+
 
 ///////////////////////////////////////////////////////////////
 const httpServer = createServer(app);
 const io = new Server(httpServer);
 
-io.on("connection", (socket) => {
-    console.log('a user connected');
-    socket.emit("hello from server", 1, "2", { 3: Buffer.from([4]) });
+io.emit(`inithuhu`, initValue[0])
 
-    // receive a message from the client
-    socket.on("chat message", (...args) => {
-        console.log('help from client')
-    });
+io.on("connection", (socket) => {
+    console.log('An user connted to server Socket.io');
+
+    // socket.emit(`init ${AIO_FEED_ID[2]}`, initValue[2])
     
     mqttClient.on('message', (topic, message) => {
-        console.log('gui du lieu nek')
-        io.emit('sensor-data', message.toString())
+        console.log(message, topic)
+        const feed = topic.split('/')[2];
+        io.emit(`init ${feed}`, initValue[1])
     });
 
-    socket.on("toggleswitch", (data) => {
-        console.log('nhận đc toggle', data)
-            
-        mqttClient.publish(`${AIO_USERNAME}/feeds/${AIO_FEED_ID}`, JSON.stringify(parseInt(data)), { qos: 1 }, (err) => {
+    mqttClient.on('message', (topic, message) => {
+        const parsedTopic = topic.split('/');
+        console.log('gui du lieu từ', parsedTopic[2], message)
+        socket.emit(`toggle ${parsedTopic[2]}`, message.toString())
+    });
+
+    socket.on("toggleswitch", (data, name) => {
+        console.log('nhận đc toggle', data, name)
+        mqttClient.publish(`${AIO_USERNAME}/feeds/${name}`, JSON.stringify(parseInt(data)), { qos: 1 }, (err) => {
             if (err) {
-            console.error(`Failed to publish data to feed "${AIO_FEED_ID}": ${err}`);
+            console.error(`Failed to publish data to feed "${name}": ${err}`);
             } else {
-            console.log(`Published data to feed "${AIO_FEED_ID}": ${JSON.stringify(data)}`);
+            console.log(`Published data to feed "${name}": ${JSON.stringify(data)}`);
             }
         });
     })
     
 });
 
-
-
-
 //////////////////////////////////////////////////////////////////
-
 mongoose.connect(process.env.CONNECTION_URL, {
     useNewUrlParser: true,
     useUnifiedTopology: true
@@ -88,7 +102,6 @@ mongoose.connect(process.env.CONNECTION_URL, {
 .catch(error =>{
     console.log(`Server error: ${error}`)
 })
-
 
 
 
