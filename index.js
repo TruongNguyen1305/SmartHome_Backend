@@ -58,18 +58,10 @@ mqttClient.on('connect', () => {
 const httpServer = createServer(app);
 const io = new Server(httpServer);
 
-io.emit(`inithuhu`, initValue[0])
 
 io.on("connection", (socket) => {
     console.log('An user connted to server Socket.io');
 
-    // socket.emit(`init ${AIO_FEED_ID[2]}`, initValue[2])
-    
-    mqttClient.on('message', (topic, message) => {
-        console.log(message, topic)
-        const feed = topic.split('/')[2];
-        io.emit(`init ${feed}`, initValue[1])
-    });
 
     mqttClient.on('message', (topic, message) => {
         const parsedTopic = topic.split('/');
