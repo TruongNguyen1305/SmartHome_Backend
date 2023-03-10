@@ -2,15 +2,12 @@ import mongoose from "mongoose";
 
 const ScheduleSchema = new mongoose.Schema(
     {
-        deviceID: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "User",
-        },
+        deviceID: {type: String, required: true},
         creator: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "User",
         },
-        value: Number,
+        status: Number,
         timeSchedule: Date,
     },
     {
