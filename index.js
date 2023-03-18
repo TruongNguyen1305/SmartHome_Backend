@@ -31,7 +31,8 @@ const PORT = process.env.PORT || 5000
 /////////////////////////////////////////////////////////////////
 const AIO_USERNAME = process.env.AIO_USERNAME
 const AIO_KEY = process.env.AIO_KEY
-const AIO_FEED_ID = ['smarthome-dadn.smart-light','smarthome-dadn.smart-fan', 'smarthome-dadn.smart-door']
+const AIO_FEED_ID = ['led','bbc-fan', 'bbc-door']
+const AIO_FEED_SENSOR_ID = ['bbc-temp', 'bbc-humi']
 
 const mqttClient = mqtt.connect({
     host: `io.adafruit.com`,
@@ -40,17 +41,17 @@ const mqttClient = mqtt.connect({
     password: AIO_KEY,
 });
 
-let initValue = []
-
-
 mqttClient.on('connect', () => {
     AIO_FEED_ID.map((item) => {
         mqttClient.subscribe(`${AIO_USERNAME}/feeds/${item}`);
         console.log(`Connected ${item} to Adafruit IO`);
-        mqttClient.publish(`${AIO_USERNAME}/feeds/${item}/get`, '');
+        // mqttClient.publish(`${AIO_USERNAME}/feeds/${item}/get`, '');
+    })
+    AIO_FEED_SENSOR_ID.map((item) => {
+        mqttClient.subscribe(`${AIO_USERNAME}/feeds/${item}`);
+        console.log(`Connected ${item} to Adafruit)`)
     })
     // Đăng ký chủ đề để nhận giá trị từ feed
-    // Gửi yêu cầu để nhận giá trị hiện tại của feed
 });
 
 
@@ -62,8 +63,8 @@ const io = new Server(httpServer);
 io.on("connection", (socket) => {
     console.log('An user connted to server Socket.io');
 
-
     mqttClient.on('message', (topic, message) => {
+        console.log(topic)
         const parsedTopic = topic.split('/');
         console.log('gui du lieu từ', parsedTopic[2], message)
         socket.emit(`toggle ${parsedTopic[2]}`, message.toString())

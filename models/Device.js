@@ -4,9 +4,10 @@ const DeviceSchema = new mongoose.Schema(
     {
         name: String,
         type: String,
-        enabled: Boolean,
-        data: String,
-        onAutoMode: Boolean,
+        homeID: {
+          type: mongoose.Schema.Types.ObjectId,
+          required: true,
+        },
     },
     {
       timestamps: true,

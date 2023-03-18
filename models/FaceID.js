@@ -2,7 +2,10 @@ import mongoose from "mongoose";
 
 const DeviceLogSchema = new mongoose.Schema(
     {
-      userid: String,
+      userID: {
+        type: mongoose.Schema.Types.ObjectId,
+        required: true
+      },
       name: String,
       images: [String],
     },

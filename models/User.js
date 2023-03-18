@@ -8,14 +8,10 @@ const UserSchema = new mongoose.Schema({
     name: { type: String, required: true, minLength: 5 },
 
     pinCode: String,
-    home: {
+    homeID: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "Home",
+        required: true,
     },
-    facesRecog: [{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "FaceID",
-    }],
 }, {
     timestamps: true
 })
