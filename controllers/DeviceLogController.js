@@ -1,11 +1,10 @@
-import DeviceLog from "../models/DeviceLog";
-import Device from "../models/Device";
+import DeviceLog from "../models/DeviceLog.js";
 
 
-// const addDeviceLog = async(req, res, next) => {
-//     try {
-//         const {name, type, enabled, data, onAutoMode, feedKey} = req.params
-
-        
-//     }
-// }
+export const addDeviceLog = async(req, res, next) => {
+    const {deviceID, creatorID, value} = req.body
+    
+    DeviceLog.create({deviceID, creatorID, value})
+        .then((deviceLog) => res.status(201).json(deviceLog))
+        .catch(next)
+}

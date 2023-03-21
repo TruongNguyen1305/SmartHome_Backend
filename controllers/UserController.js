@@ -10,10 +10,6 @@ const validateEmail = (email) => {
         );
 };
 
-// const validatePhone = (phone) => {
-//     return phone.match(/(84|0[3|5|7|8|9])+([0-9]{8})\b/)
-// }
-
 // [GET] /api/users
 export const getAllUsers = async (req, res, next) => {
     try {

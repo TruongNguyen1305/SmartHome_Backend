@@ -2,6 +2,9 @@ import mongoose from "mongoose";
 
 const HomeSchema = new mongoose.Schema(
     {
+        name: 'String',
+    },
+    {
         timestamps: true,
     }
   );
