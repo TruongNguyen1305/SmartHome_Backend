@@ -4,9 +4,13 @@ const DeviceLogSchema = new mongoose.Schema(
     {
         deviceID: {
             type: mongoose.Schema.Types.ObjectId,
+            ref: 'Device',
             required: true
         },
-        creatorID: mongoose.Schema.Types.ObjectId,
+        creatorID: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: 'User',
+        },
         value: Number,
     },
     {

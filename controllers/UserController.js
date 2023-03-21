@@ -85,7 +85,7 @@ export const authUser = async (req, res, next) => {
                 name: user.name,
                 email: user.email,
                 pinCode: user.pinCode,
-                home: user.home,
+                homeID: user.homeID,
                 token: generateToken(user._id),
             })
         }
