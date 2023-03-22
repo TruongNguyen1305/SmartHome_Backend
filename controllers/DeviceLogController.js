@@ -12,9 +12,9 @@ export const addDeviceLog = async(req, res, next) => {
 
 // [GET /api/devicelog/:id
 export const getAllDeviceLogOfHome = async(req, res, next) => {
-    const homeID  = req.params.id
+    const homeID = req.params.id
 
-
+    console.log(homeID)
     Device.find({homeID: homeID})
         .then((dataDevice) => {
             DeviceLog.find({deviceID: { $in: dataDevice}}).populate('creatorID', 'name').populate('deviceID', 'type')
