@@ -17,7 +17,7 @@ export const getAllDeviceLogOfHome = async(req, res, next) => {
     console.log(homeID)
     Device.find({homeID: homeID})
         .then((dataDevice) => {
-            DeviceLog.find({deviceID: { $in: dataDevice}}).populate('creatorID', 'name').populate('deviceID', 'type')
+            DeviceLog.find({deviceID: { $in: dataDevice}}).populate('creatorID', 'name').populate('deviceID', 'type').sort({createdAt: -1}).limit(15)
                 .then((data) => 
                         // console.log(addName(data))
                         res.status(201).json(data)

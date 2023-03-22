@@ -5,6 +5,7 @@ import route from './routes/index.js'
 import mongoose from 'mongoose'
 import { notFound, errorHandler } from './middlewares/errorMiddleware.js'
 import cors from 'cors'
+import User from './models/User.js'
 
 // Socket.io
 import { Server } from "socket.io";
@@ -61,7 +62,22 @@ const io = new Server(httpServer);
 
 
 io.on("connection", (socket) => {
-    console.log('An user connted to server Socket.io');
+    // console.log('An user connted to server Socket.io');
+
+    socket.on('setup', (userId)=> {
+        socket.join(userId)
+        console.log(`User ${userId} connected`)
+    })
+
+    socket.on('send notif', async (data, homeID)=>{
+        const users = await User.find({
+            homeID
+        })
+        users.forEach(user => {
+            if (user._id === data.creatorID) return
+            socket.in(user._id).emit('notif received', data)
+        })
+    })
 
     mqttClient.on('message', (topic, message) => {
         console.log(topic)
