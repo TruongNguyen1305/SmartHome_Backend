@@ -1,9 +1,10 @@
 import mongoose from "mongoose";
 
-const DeviceLogSchema = new mongoose.Schema(
+const FaceIDSchema = new mongoose.Schema(
     {
       userID: {
         type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
         required: true
       },
       name: String,
@@ -13,6 +14,6 @@ const DeviceLogSchema = new mongoose.Schema(
       timestamps: true,
     }
   );
-  const DeviceLog = mongoose.model("DeviceLog", DeviceLogSchema);
+  const FaceID = mongoose.model("FaceID", FaceIDSchema);
   
-  export default DeviceLog;
+  export default FaceID;
