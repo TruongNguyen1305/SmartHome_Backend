@@ -8,6 +8,8 @@ router.route('/').post(UserController.registerUser).get(verifyToken, UserControl
 router.get('/test',UserController.getAllUsers)
 router.post('/login',UserController.authUser)
 router.put('/setpin',UserController.setPin)
+router.post('/addface',UserController.addFace)
+router.post('/deleteface',UserController.deleteFace)
 
 
 export default router

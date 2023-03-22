@@ -11,6 +11,7 @@ const UserSchema = new mongoose.Schema({
     homeID: {
         type: mongoose.Schema.Types.ObjectId,
         required: true,
+        ref: 'Home',
     },
 }, {
     timestamps: true

@@ -1,6 +1,10 @@
 import User from "../models/User.js";
 import Home from "../models/Home.js";
+import FaceID from "../models/FaceID.js";
+
 import generateToken from "../config/generateToken.js";
+
+
 
 const validateEmail = (email) => {
     return String(email)
@@ -102,7 +106,6 @@ export const authUser = async (req, res, next) => {
 //[PUT] /api/user/setpin
 export const setPin = async (req, res, next) => {
     const { _id, pinCode } = req.body
-    console.log(_id, pinCode)
     User.findOneAndUpdate({_id: _id}, {pinCode: pinCode}, {new: true})
     .then(updatedUser => {
         console.log(updatedUser); // Log ra user đã được update
@@ -121,3 +124,29 @@ export const setPin = async (req, res, next) => {
         next(new Error('Error'))
     });
 }
+
+//[POST] /api/user/addface
+export const addFace = async (req, res, next) => {
+    const {userID, name, images} = req.body
+
+    FaceID.create({ userID, name, images })
+        .then((image) =>    
+            res.status(201).json({
+                userID: image.userID,
+                name: image.name,
+                images: image.images,
+            })
+        )
+        .catch(next)
+}
+
+//[POST]/api/user/deleteface
+export const deleteFace = async (req, res, next) => {
+    const { face_id } = req.body
+    
+    FaceID.deleteOne({_id: face_id})
+        .then((e) => res.status(200).json({ message: "Xoá thành công" }))
+        .catch(next)
+}
+
+
