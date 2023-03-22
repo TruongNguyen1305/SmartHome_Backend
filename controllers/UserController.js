@@ -57,13 +57,13 @@ export const registerUser = async (req, res, next) => {
             if (!home)
                 next(new Error('Key Home invalid'))
         }
-        const user = new User({ name, email, password, home })
+        const user = new User({ name, email, password, homeID: home })
         await user.save()
         res.status(201).json({
             _id: user._id,
             name: user.name,
             email: user.email,
-            home: user.home,
+            homeID: user.homeID,
             token: generateToken(user._id)
         })
     } catch (error) {
