@@ -6,7 +6,6 @@ const DeviceSchema = new mongoose.Schema(
         type: String,
         homeID: {
           type: mongoose.Schema.Types.ObjectId,
-          ref: 'Home',
           required: true,
         },
     },
