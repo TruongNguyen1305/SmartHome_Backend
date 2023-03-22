@@ -53,13 +53,13 @@ export const registerUser = async (req, res, next) => {
             if (!home)
                 next(new Error('Key Home invalid'))
         }
-        const user = new User({ name, email, password, home })
+        const user = new User({ name, email, password, homeID: home._id })
         await user.save()
         res.status(201).json({
             _id: user._id,
             name: user.name,
             email: user.email,
-            home: user.home,
+            home: user.homeID,
             token: generateToken(user._id)
         })
     } catch (error) {
@@ -111,7 +111,7 @@ export const setPin = async (req, res, next) => {
             name: updatedUser.name,
             email: updatedUser.email,
             pinCode: updatedUser.pinCode,
-            home: updatedUser.home,
+            home: updatedUser.homeID,
             token: generateToken(updatedUser._id)
         })
         

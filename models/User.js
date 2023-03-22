@@ -10,6 +10,7 @@ const UserSchema = new mongoose.Schema({
     pinCode: String,
     homeID: {
         type: mongoose.Schema.Types.ObjectId,
+        ref: 'Home',
         required: true,
     },
 }, {
