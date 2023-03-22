@@ -17,20 +17,21 @@ export const getAllSchedule = async (req, res, next) => {
 
 //[POST] /api/schedules/:deviceId
 export const createSchedule = async (req, res, next) => {
-    const { action, timeSchedule } = req.body
+    const { action } = req.body
+    let {timeSchedule} = req.body
     const {deviceId} = req.params
-    console.log(deviceId)
+    timeSchedule = new Date(timeSchedule)
     try {
-        const schedules = await Schedule.find({ deviceId })
+        const schedules = await Schedule.find({ deviceId, timeSchedule: { $gte: new Date() } })
         schedules.map(schedule => {
             if (schedule.timeSchedule.toString() === timeSchedule.toString()) {
-                throw new Error(`Schedule is duplicated`)
+                throw new Error('Schedule is duplicated')
             }
         })
 
         const newSchedule = new Schedule({ deviceId, creator: req.user._id, action, timeSchedule })
         await newSchedule.save()
-        res.status(201).json(await Schedule.find({ deviceId }).sort({ timeSchedule: 1 }))
+        res.status(201).json(await Schedule.find({ deviceId, timeSchedule: { $gte: new Date() } }).sort({ timeSchedule: 1 }))
     } catch (error) {
         next(error)
     }
@@ -38,13 +39,15 @@ export const createSchedule = async (req, res, next) => {
 
 //[PATCH] /api/schedules/:deviceId/:scheduleId
 export const editSchedule = async (req, res, next) => {
-    const { action, timeSchedule } = req.body
+    const { action } = req.body
+    let { timeSchedule } = req.body
     const { deviceId, scheduleId } = req.params
+    timeSchedule = new Date(timeSchedule)
     try {
-        const schedules = await Schedule.find({ deviceId })
+        const schedules = await Schedule.find({ deviceId, timeSchedule: { $gte: new Date() }  })
         schedules.map(schedule => {
             if (schedule.timeSchedule.toString() === timeSchedule.toString() && schedule._id !== scheduleId) {
-                throw new Error(`Schedule is duplicated`)
+                throw new Error('Schedule is duplicated')
             }
         })
 
@@ -53,7 +56,7 @@ export const editSchedule = async (req, res, next) => {
             action, 
             timeSchedule
         })
-        res.status(200).json(await Schedule.find({ deviceId }).sort({ timeSchedule: 1}))
+        res.status(200).json(await Schedule.find({ deviceId, timeSchedule: { $gte: new Date() } }).sort({ timeSchedule: 1}))
     } catch (error) {
         next(error)
     }
@@ -61,7 +64,6 @@ export const editSchedule = async (req, res, next) => {
 
 //[PATCH] /api/schedules/:deviceId/:scheduleId/toggle
 export const toggleSchedule = async (req, res, next) => {
-    console.log('cc')
     const { status } = req.body
     const {scheduleId} = req.params
     try {
@@ -79,7 +81,7 @@ export const deleteSchedule = async (req, res, next) => {
     const {deviceId, scheduleId} = req.params
     try {
         await Schedule.findByIdAndRemove(scheduleId)
-        res.status(200).json(await Schedule.find({ deviceId }).sort({ timeSchedule: 1 }))
+        res.status(200).json(await Schedule.find({ deviceId, timeSchedule: { $gte: new Date() } }).sort({ timeSchedule: 1 }))
     } catch (error) {
         next(error)
     }
