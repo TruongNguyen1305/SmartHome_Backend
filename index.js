@@ -70,13 +70,19 @@ io.on("connection", (socket) => {
     })
 
     socket.on('send notif', async (data, homeID)=>{
+        console.log('send notif')
         const users = await User.find({
             homeID
         })
         users.forEach(user => {
-            if (user._id === data.creatorID) return
-            socket.in(user._id).emit('notif received', data)
+            if (user._id.toString() === data.creatorID) return
+            socket.to(user._id.toString()).emit('notif received', data)
         })
+    })
+
+    socket.on('logout', (userId)=>{
+        console.log(`User ${userId} logged out`)
+        socket.leave(userId)
     })
 
     mqttClient.on('message', (topic, message) => {
