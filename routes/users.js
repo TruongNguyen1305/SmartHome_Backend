@@ -10,6 +10,7 @@ router.post('/login',UserController.authUser)
 router.put('/setpin',UserController.setPin)
 router.post('/addface',UserController.addFace)
 router.post('/deleteface',UserController.deleteFace)
+router.get('/getface/:id',UserController.getFace)
 
 
 export default router

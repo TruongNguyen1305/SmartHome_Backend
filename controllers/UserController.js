@@ -103,7 +103,7 @@ export const authUser = async (req, res, next) => {
     }
 }
 
-//[PUT] /api/user/setpin
+//[PUT] /api/users/setpin
 export const setPin = async (req, res, next) => {
     const { _id, pinCode } = req.body
     User.findOneAndUpdate({_id: _id}, {pinCode: pinCode}, {new: true})
@@ -125,10 +125,11 @@ export const setPin = async (req, res, next) => {
     });
 }
 
-//[POST] /api/user/addface
+//[POST] /api/users/addface
 export const addFace = async (req, res, next) => {
     const {userID, name, images} = req.body
 
+    console.log('alo')
     FaceID.create({ userID, name, images })
         .then((image) =>    
             res.status(201).json({
@@ -140,12 +141,25 @@ export const addFace = async (req, res, next) => {
         .catch(next)
 }
 
-//[POST]/api/user/deleteface
+//[POST]/api/users/deleteface
 export const deleteFace = async (req, res, next) => {
     const { face_id } = req.body
     
     FaceID.deleteOne({_id: face_id})
         .then((e) => res.status(200).json({ message: "Xoá thành công" }))
+        .catch(next)
+}
+
+// [GET]/api/users/getface
+export const getFace = (req, res, next) => {
+    const userID = req.params.id
+    console.log(userID)
+    FaceID.find({userID})
+        .then(face => 
+            {
+                res.status(201).json(face)    
+            }
+        )
         .catch(next)
 }
 

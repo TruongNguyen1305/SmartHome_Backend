@@ -14,7 +14,7 @@ import { createServer } from "http";
 // MQTT
 import mqtt from 'mqtt'
 
-
+/////////////////////////////////////////////////////////////////
 dotenv.config() 
 const app = express()
 
@@ -28,7 +28,6 @@ route(app)
 app.use(notFound)
 app.use(errorHandler)
 const PORT = process.env.PORT || 5000
-
 /////////////////////////////////////////////////////////////////
 const AIO_USERNAME = process.env.AIO_USERNAME
 const AIO_KEY = process.env.AIO_KEY
@@ -47,11 +46,11 @@ mqttClient.on('connect', () => {
     AIO_FEED_ID.map((item) => {
         mqttClient.subscribe(`${AIO_USERNAME}/feeds/${item}`);
         console.log(`Connected ${item} to Adafruit IO`);
-        // mqttClient.publish(`${AIO_USERNAME}/feeds/${item}/get`, '');
     })
+    
     AIO_FEED_SENSOR_ID.map((item) => {
         mqttClient.subscribe(`${AIO_USERNAME}/feeds/${item}`);
-        console.log(`Connected ${item} to Adafruit)`)
+        console.log(`Connected ${item} to Adafruit`)
     })
 
     AIO_FEED_ADJUST_ID.map((item) => {
@@ -60,15 +59,11 @@ mqttClient.on('connect', () => {
     })
     // Đăng ký chủ đề để nhận giá trị từ feed
 });
-
-
 ///////////////////////////////////////////////////////////////
 const httpServer = createServer(app);
 const io = new Server(httpServer);
-
-
 io.on("connection", (socket) => {
-    // console.log('An user connted to server Socket.io');
+    console.log('An user connted to server Socket.io');
 
     socket.on('setup', (userId)=> {
         socket.join(userId)
@@ -99,12 +94,11 @@ io.on("connection", (socket) => {
     });
 
     socket.on("toggleswitch", (data, name) => {
-        console.log('nhận đc toggle', data, name)
         mqttClient.publish(`${AIO_USERNAME}/feeds/${name}`, JSON.stringify(parseInt(data)), { qos: 1 }, (err) => {
             if (err) {
-            console.error(`Failed to publish data to feed "${name}": ${err}`);
+                console.error(`Failed to publish data to feed "${name}": ${err}`);
             } else {
-            console.log(`Published data to feed "${name}": ${JSON.stringify(data)}`);
+                console.log(`Published data to feed "${name}": ${JSON.stringify(data)}`);
             }
         });
     })
@@ -121,7 +115,6 @@ io.on("connection", (socket) => {
     })
     
 });
-
 //////////////////////////////////////////////////////////////////
 mongoose.connect(process.env.CONNECTION_URL, {
     useNewUrlParser: true,
