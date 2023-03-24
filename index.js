@@ -34,6 +34,7 @@ const AIO_USERNAME = process.env.AIO_USERNAME
 const AIO_KEY = process.env.AIO_KEY
 const AIO_FEED_ID = ['led','bbc-fan', 'bbc-door']
 const AIO_FEED_SENSOR_ID = ['bbc-temp', 'bbc-humi']
+const AIO_FEED_ADJUST_ID = ['bbc-led-light', 'bbc-fan-power']
 
 const mqttClient = mqtt.connect({
     host: `io.adafruit.com`,
@@ -51,6 +52,11 @@ mqttClient.on('connect', () => {
     AIO_FEED_SENSOR_ID.map((item) => {
         mqttClient.subscribe(`${AIO_USERNAME}/feeds/${item}`);
         console.log(`Connected ${item} to Adafruit)`)
+    })
+
+    AIO_FEED_ADJUST_ID.map((item) => {
+        mqttClient.subscribe(`${AIO_USERNAME}/feeds/${item}`);
+        console.log(`Connected ${item} to Adafruit IO`);
     })
     // Đăng ký chủ đề để nhận giá trị từ feed
 });
@@ -99,6 +105,17 @@ io.on("connection", (socket) => {
             console.error(`Failed to publish data to feed "${name}": ${err}`);
             } else {
             console.log(`Published data to feed "${name}": ${JSON.stringify(data)}`);
+            }
+        });
+    })
+
+    socket.on("adjust value", (data, name) => {
+        console.log('nhận đc thay đổi', data, name)
+        mqttClient.publish(`${AIO_USERNAME}/feeds/${name}`, JSON.stringify(parseInt(data)), { qos: 1 }, (err) => {
+            if (err) {
+                console.error(`Failed to publish data to feed "${name}": ${err}`);
+            } else {
+                console.log(`Published data to feed "${name}": ${JSON.stringify(data)}`);
             }
         });
     })
