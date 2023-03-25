@@ -47,25 +47,19 @@ export const registerUser = async (req, res, next) => {
     }
 
     try {
-        let home
-        if (homeID == "") {
-            home = new Home({deivces: []})
-            await home.save()
-        }
-        else {
-            home = await Home.findOne({ _id: homeID })
-            if (!home)
-                next(new Error('Key Home invalid'))
-        }
-        const user = new User({ name, email, password, homeID: home._id })
-        await user.save()
-        res.status(201).json({
-            _id: user._id,
-            name: user.name,
-            email: user.email,
-            homeID: user.homeID,
-            token: generateToken(user._id)
-        })
+        Home.findOne({ _id: homeID })
+            .then(async (home) => {
+                const user = new User({ name, email, password, homeID: home._id })
+                await user.save()
+                res.status(201).json({
+                    _id: user._id,
+                    name: user.name,
+                    email: user.email,
+                    homeID: user.homeID,
+                    token: generateToken(user._id)
+                })
+            })
+            .catch((error) => next(new Error('Home Key invalid')))
     } catch (error) {
         console.log(error.message)
         next(error)
@@ -117,7 +111,6 @@ export const setPin = async (req, res, next) => {
             home: updatedUser.homeID,
             token: generateToken(updatedUser._id)
         })
-        
     })
     .catch(error => {
         res.status(401)

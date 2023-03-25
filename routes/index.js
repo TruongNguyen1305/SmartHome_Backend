@@ -1,6 +1,6 @@
 import userRouter from './users.js'
 import scheduleRouter from './schedule.js'
-import deviceLogRouter from './deviceLog.js'
+import deviceLogRouter from './devicelog.js'
 import deviceRouter from './device.js'
 
 export default function route(app) {
