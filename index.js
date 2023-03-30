@@ -6,13 +6,12 @@ import mongoose from 'mongoose'
 import { notFound, errorHandler } from './middlewares/errorMiddleware.js'
 import cors from 'cors'
 import User from './models/User.js'
-
+import Schedule from './models/Schedule.js'
+import scheduler from  'node-schedule'
+import { mqttClient, AIO_USERNAME } from './config/mqttClient.js'
 // Socket.io
 import { Server } from "socket.io";
 import { createServer } from "http";
-
-// MQTT
-import mqtt from 'mqtt'
 
 /////////////////////////////////////////////////////////////////
 dotenv.config() 
@@ -29,43 +28,16 @@ app.use(notFound)
 app.use(errorHandler)
 const PORT = process.env.PORT || 5000
 /////////////////////////////////////////////////////////////////
-const AIO_USERNAME = process.env.AIO_USERNAME
-const AIO_KEY = process.env.AIO_KEY
-const AIO_FEED_ID = ['led','bbc-fan', 'bbc-door']
-const AIO_FEED_SENSOR_ID = ['bbc-temp', 'bbc-humi']
-const AIO_FEED_ADJUST_ID = ['bbc-led-light', 'bbc-fan-power']
 
-const mqttClient = mqtt.connect({
-    host: `io.adafruit.com`,
-    port: 1883,
-    username: AIO_USERNAME,
-    password: AIO_KEY,
-});
 
-mqttClient.on('connect', () => {
-    AIO_FEED_ID.map((item) => {
-        mqttClient.subscribe(`${AIO_USERNAME}/feeds/${item}`);
-        console.log(`Connected ${item} to Adafruit IO`);
-    })
-    
-    AIO_FEED_SENSOR_ID.map((item) => {
-        mqttClient.subscribe(`${AIO_USERNAME}/feeds/${item}`);
-        console.log(`Connected ${item} to Adafruit`)
-    })
-
-    AIO_FEED_ADJUST_ID.map((item) => {
-        mqttClient.subscribe(`${AIO_USERNAME}/feeds/${item}`);
-        console.log(`Connected ${item} to Adafruit IO`);
-    })
-    // Đăng ký chủ đề để nhận giá trị từ feed
-});
-///////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////
 const httpServer = createServer(app);
 const io = new Server(httpServer);
 io.on("connection", (socket) => {
     console.log('An user connted to server Socket.io');
 
     socket.on('setup', (userId)=> {
+        socket.leave(userId)
         socket.join(userId)
         console.log(`User ${userId} connected`)
     })
@@ -120,6 +92,14 @@ mongoose.connect(process.env.CONNECTION_URL, {
     useNewUrlParser: true,
     useUnifiedTopology: true
 }).then(() =>{
+    scheduler.scheduleJob('0 1 28 * *', async ()=>{
+        const date = new Date()
+        await Schedule.deleteMany({
+            timeSchedule: { $lte: date }
+        })
+        console.log(`Clear schedule per month (${date.getMonth() + 1})`)
+    }) //clear schedule per day 28 of month
+
     httpServer.listen(PORT, () => {
         console.log(`Server listening on port ${PORT}`)
     })
