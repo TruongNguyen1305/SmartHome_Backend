@@ -47,25 +47,19 @@ export const registerUser = async (req, res, next) => {
     }
 
     try {
-        let home
-        if (homeID == "") {
-            home = new Home({deivces: []})
-            await home.save()
-        }
-        else {
-            home = await Home.findOne({ _id: homeID })
-            if (!home)
-                next(new Error('Key Home invalid'))
-        }
-        const user = new User({ name, email, password, homeID: home._id })
-        await user.save()
-        res.status(201).json({
-            _id: user._id,
-            name: user.name,
-            email: user.email,
-            homeID: user.homeID,
-            token: generateToken(user._id)
-        })
+        Home.findOne({ _id: homeID })
+            .then(async (home) => {
+                const user = new User({ name, email, password, homeID: home._id })
+                await user.save()
+                res.status(201).json({
+                    _id: user._id,
+                    name: user.name,
+                    email: user.email,
+                    homeID: user.homeID,
+                    token: generateToken(user._id)
+                })
+            })
+            .catch((error) => next(new Error('Home Key invalid')))
     } catch (error) {
         console.log(error.message)
         next(error)
@@ -117,7 +111,6 @@ export const setPin = async (req, res, next) => {
             home: updatedUser.homeID,
             token: generateToken(updatedUser._id)
         })
-        
     })
     .catch(error => {
         res.status(401)
@@ -129,7 +122,6 @@ export const setPin = async (req, res, next) => {
 export const addFace = async (req, res, next) => {
     const {userID, name, images} = req.body
 
-    console.log('alo')
     FaceID.create({ userID, name, images })
         .then((image) =>    
             res.status(201).json({
@@ -143,10 +135,22 @@ export const addFace = async (req, res, next) => {
 
 //[POST]/api/users/deleteface
 export const deleteFace = async (req, res, next) => {
-    const { face_id } = req.body
+    const { face_id, user_id } = req.body
+    if (!face_id) {
+        res.status(400)
+        next(new Error('Bạn phải điền các thông tin cần thiết'))
+    }
     
     FaceID.deleteOne({_id: face_id})
-        .then((e) => res.status(200).json({ message: "Xoá thành công" }))
+        .then((e) => {
+            FaceID.find({userID: user_id})
+            .then(face => 
+                {
+                    res.status(201).json(face)    
+                }
+            )
+            .catch(next)
+        })
         .catch(next)
 }
 
