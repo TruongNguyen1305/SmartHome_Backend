@@ -9,6 +9,12 @@ const DeviceSchema = new mongoose.Schema(
           // ref: 'Home',
           required: true,
         },
+        auto: {
+          type: Boolean,
+          default: false,
+        },
+        onValue: Number,
+        offValue: Number
     },
     {
       timestamps: true,
