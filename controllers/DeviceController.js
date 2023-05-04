@@ -14,35 +14,23 @@ export const getAllDevice = async (req, res, next) => {
 }
 
 export const changeAutomaticValue = async (req, res, next) => {
-    Device.findOneAndUpdate(
-        { _id: req.body.id },
-        {
-            onValue: req.body.onValue,
-            offValue: req.body.offValue
-        }
-    )
-        .then((data) => {
-            console.log(data)
-            res.status(200).json(data)
-        })
-        .catch(error => {
-            res.status(401)
-            next(new Error('Error'))
-        });
+    const filter = { _id: req.body.id };
+    const update = {
+        onValue: req.body.onValue,
+        offValue: req.body.offValue
+    };
+   
+    let device = await Device.findOneAndUpdate(filter, update);
+    device = await Device.findOne(filter);
+    console.log(device)
+    res.status(200).json(device)
 }
 
 export const toggleAutomaticMode = async (req, res, next) => {
-    Device.findOneAndUpdate( { _id: req.body.id },
-        {
-            auto: req.body.value
-        }
-    )
-        .then((data) => {
-            console.log(data)
-            res.status(200).json(data)
-        })
-        .catch(error => {
-            res.status(401)
-            next(new Error('Error'))
-        });
+    const filter = { _id: req.body.id };
+    const update = { auto: req.body.value };
+
+    let device = await Device.findOneAndUpdate(filter, update);
+    device = await Device.findOne(filter);
+    res.status(200).json(device)
 }

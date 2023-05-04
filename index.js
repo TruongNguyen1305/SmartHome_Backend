@@ -36,7 +36,6 @@ const httpServer = createServer(app);
 const io = new Server(httpServer);
 io.on("connection", (socket) => {
     console.log('An user connted to server Socket.io');
-
     socket.on('setup', (userId)=> {
         socket.leave(userId)
         socket.join(userId)
@@ -85,7 +84,6 @@ io.on("connection", (socket) => {
             }
         });
     })
-    
 });
 
 mqttClient.on('message', (topic, message) => {
