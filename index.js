@@ -90,13 +90,14 @@ io.on("connection", (socket) => {
 
 mqttClient.on('message', (topic, message) => {
     const parsedTopic = topic.split('/');
-    checkAutomationDevice(parseInt(message), parsedTopic[2])
+    if (['bbc-temp', 'light_intensity'].includes(parsedTopic[2]))
+        checkAutomationDevice(parseInt(message), parsedTopic[2])
 });
 
 async function checkAutomationDevice(value, feedId){
     const device = await Device.findOne({
         auto: true,
-        type: feedId === 'led' ? 'light' : 'fan'
+        type: feedId === 'light_intensity' ? 'light' : 'fan'
     })
 
     if(device){
@@ -120,9 +121,9 @@ async function checkAutomationDevice(value, feedId){
         if (data != null) {
             mqttClient.publish(`${AIO_USERNAME}/feeds/${name}`, JSON.stringify(parseInt(data)), { qos: 1 }, (err) => {
                 if (err) {
-                    console.error(`Failed to publish data to feed "${name}": ${err}`);
+                    console.error(`That bai`);
                 } else {
-                    console.log(`Published data to feed "${name}": ${JSON.stringify(data)}`);
+                    console.log(`Thanh cong`);
                 }
             });
         }
