@@ -34,6 +34,14 @@ mqttClient.on('connect', () => {
     // Đăng ký chủ đề để nhận giá trị từ feed
 });
 
+
+// mqttClient.on('message', (topic, message) => {
+//     console.log(topic)
+//     const parsedTopic = topic.split('/');
+//     console.log('gui du lieu từ', parsedTopic[2], message)
+//     socket.emit(`toggle ${parsedTopic[2]}`, message.toString())
+// });
+
 export {
     mqttClient,
     AIO_USERNAME
