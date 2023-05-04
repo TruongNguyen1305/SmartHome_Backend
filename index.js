@@ -6,6 +6,7 @@ import mongoose from 'mongoose'
 import { notFound, errorHandler } from './middlewares/errorMiddleware.js'
 import cors from 'cors'
 import User from './models/User.js'
+import Device from './models/Device.js'
 import Schedule from './models/Schedule.js'
 import scheduler from  'node-schedule'
 import { mqttClient, AIO_USERNAME } from './config/mqttClient.js'
@@ -59,7 +60,6 @@ io.on("connection", (socket) => {
     })
 
     mqttClient.on('message', (topic, message) => {
-        console.log(topic)
         const parsedTopic = topic.split('/');
         console.log('gui du lieu từ', parsedTopic[2], message)
         socket.emit(`toggle ${parsedTopic[2]}`, message.toString())
@@ -87,6 +87,48 @@ io.on("connection", (socket) => {
     })
     
 });
+
+mqttClient.on('message', (topic, message) => {
+    const parsedTopic = topic.split('/');
+    checkAutomationDevice(parseInt(message), parsedTopic[2])
+});
+
+async function checkAutomationDevice(value, feedId){
+    const device = await Device.findOne({
+        auto: true,
+        type: feedId === 'led' ? 'light' : 'fan'
+    })
+
+    if(device){
+        let name;
+        let data = null;
+        if (device.type === "light") {
+            name = "led"
+            if (value <= (device.onValue || 100))
+                data = 1
+            else if (value >= (device.offValue || 300))
+                data = 0
+        }
+        else if (device.type === "fan") {
+            name = "bbc-fan"
+            if (value >= (device.onValue || 35))
+                data = 1
+            else if (value <= (device.offValue || 30))
+                data = 0
+        }
+        console.log(data)
+        if (data != null) {
+            mqttClient.publish(`${AIO_USERNAME}/feeds/${name}`, JSON.stringify(parseInt(data)), { qos: 1 }, (err) => {
+                if (err) {
+                    console.error(`Failed to publish data to feed "${name}": ${err}`);
+                } else {
+                    console.log(`Published data to feed "${name}": ${JSON.stringify(data)}`);
+                }
+            });
+        }
+    }
+}
+
 //////////////////////////////////////////////////////////////////
 mongoose.connect(process.env.CONNECTION_URL, {
     useNewUrlParser: true,
